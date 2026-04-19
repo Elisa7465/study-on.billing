@@ -3,8 +3,8 @@ PHP=$(COMPOSE) exec php
 CONSOLE=$(PHP) bin/console
 COMPOSER=$(PHP) composer
 
-up:
-	@${COMPOSE} up -d
+cs:
+	@${PHP} vendor/bin/phpcs
 
 down:
 	@${COMPOSE} down
