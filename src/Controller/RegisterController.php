@@ -14,9 +14,68 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Attributes as OA;
+
 
 final class RegisterController extends AbstractController
 {
+
+    #[OA\Post(
+    path: '/api/v1/register',
+    summary: 'Регистрация пользователя',
+    tags: ['Auth'],
+    requestBody: new OA\RequestBody(
+        required: true,
+        content: new OA\JsonContent(
+            required: ['email', 'password'],
+            properties: [
+                new OA\Property(
+                    property: 'email',
+                    type: 'string',
+                    format: 'email',
+                    example: 'user@example.com'
+                ),
+                new OA\Property(
+                    property: 'password',
+                    type: 'string',
+                    example: 'password123'
+                ),
+            ]
+        )
+    ),
+    responses: [
+        new OA\Response(
+            response: 201,
+            description: 'Пользователь создан',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'token', type: 'string', example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...'),
+                    new OA\Property(
+                        property: 'roles',
+                        type: 'array',
+                        items: new OA\Items(type: 'string')
+                    ),
+                ]
+            )
+        ),
+        new OA\Response(
+            response: 400,
+            description: 'Ошибка валидации',
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(
+                        property: 'errors',
+                        type: 'object',
+                        example: [
+                            'email' => ['Это значение не является действительным email.'],
+                            'password' => ['Это значение слишком короткое. Пароль должен быть 6 символов или больше.'],
+                        ]
+                    ),
+                ]
+            )
+        ),
+    ]
+)]
     #[Route('/api/v1/register', name: 'api_v1_register', methods: ['POST'])]
     public function __invoke(
         Request $request,
@@ -48,7 +107,7 @@ final class RegisterController extends AbstractController
         if ($userRepository->findOneBy(['email' => $userDto->email]) !== null) {
             return $this->json([
                 'errors' => [
-                    'email' => ['User with this email already exists.'],
+                    'email' => ['Пользователь с таким email уже существует.'],
                 ],
             ], 400);
         }
