@@ -78,54 +78,54 @@ final class RegisterController extends AbstractController
 )]
     #[Route('/api/v1/register', name: 'api_v1_register', methods: ['POST'])]
     public function __invoke(
-        Request $request,
-        SerializerInterface $serializer,
-        ValidatorInterface $validator,
-        UserRepository $userRepository,
-        UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager,
-        JWTTokenManagerInterface $jwtManager
-    ): JsonResponse {
-        $userDto = $serializer->deserialize(
-            $request->getContent(),
-            RegisterUserDto::class,
-            'json'
-        );
+            Request $request,
+            SerializerInterface $serializer,
+            ValidatorInterface $validator,
+            UserRepository $userRepository,
+            UserPasswordHasherInterface $passwordHasher,
+            EntityManagerInterface $entityManager,
+            JWTTokenManagerInterface $jwtManager
+      ): JsonResponse {
+            $userDto = $serializer->deserialize(
+                  $request->getContent(),
+                  RegisterUserDto::class,
+                  'json'
+            );
 
-        $errors = $validator->validate($userDto);
+            $errors = $validator->validate($userDto);
 
-        if (count($errors) > 0) {
-            $formattedErrors = [];
+            if (count($errors) > 0) {
+                  $formattedErrors = [];
 
-            foreach ($errors as $error) {
-                $formattedErrors[$error->getPropertyPath()][] = $error->getMessage();
+                  foreach ($errors as $error) {
+                  $formattedErrors[$error->getPropertyPath()][] = $error->getMessage();
+                  }
+
+                  return $this->json(['errors' => $formattedErrors], 400);
             }
 
-            return $this->json(['errors' => $formattedErrors], 400);
-        }
+            if ($userRepository->findOneBy(['email' => $userDto->email]) !== null) {
+                  return $this->json([
+                  'errors' => [
+                        'email' => ['The user with this email already exists.'],
+                  ],
+                  ], 400);
+            }
 
-        if ($userRepository->findOneBy(['email' => $userDto->email]) !== null) {
+            $user = new User();
+            $user->setEmail($userDto->email);
+            $user->setRoles(['ROLE_USER']);
+            $user->setBalance(0.0);
+            $user->setPassword(
+                  $passwordHasher->hashPassword($user, $userDto->password)
+            );
+
+            $entityManager->persist($user);
+            $entityManager->flush();
+
             return $this->json([
-                'errors' => [
-                    'email' => ['Пользователь с таким email уже существует.'],
-                ],
-            ], 400);
-        }
-
-        $user = new User();
-        $user->setEmail($userDto->email);
-        $user->setRoles(['ROLE_USER']);
-        $user->setBalance(0.0);
-        $user->setPassword(
-            $passwordHasher->hashPassword($user, $userDto->password)
-        );
-
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        return $this->json([
-            'token' => $jwtManager->create($user),
-            'roles' => $user->getRoles(),
-        ], 201);
-    }
-}
+                  'token' => $jwtManager->create($user),
+                  'roles' => $user->getRoles(),
+            ], 201);
+      }
+      }

@@ -3,7 +3,7 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
 
         driver: 'pdo_pgsql'
-        server_version: '16'
+        server_version: '18'
 
         profiling_collect_backtrace: '%kernel.debug%'
     orm:

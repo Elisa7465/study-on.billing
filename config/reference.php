@@ -1182,6 +1182,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         resolve_target_entities?: array<string, scalar|Param|null>,
  *     },
  * }
+ * @psalm-type DamaDoctrineTestConfig = array{
+ *     enable_static_connection?: mixed, // Default: true
+ *     enable_static_meta_data_cache?: bool|Param, // Default: true
+ *     enable_static_query_cache?: bool|Param, // Default: true
+ *     connection_keys?: list<mixed>,
+ * }
  * @psalm-type MakerConfig = array{
  *     root_namespace?: scalar|Param|null, // Default: "App"
  *     generate_final_classes?: bool|Param, // Default: true
@@ -1677,6 +1683,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         framework?: FrameworkConfig,
  *         security?: SecurityConfig,
  *         doctrine?: DoctrineConfig,
+ *         dama_doctrine_test?: DamaDoctrineTestConfig,
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         jms_serializer?: JmsSerializerConfig,
  *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,

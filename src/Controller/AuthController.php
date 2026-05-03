@@ -47,6 +47,5 @@ class AuthController extends AbstractController
     #[Route('/api/v1/auth', name: 'api_auth', methods: ['POST'])]
     public function auth(): JsonResponse
     {
-        return $this->json(['message' => '401 Unauthorized'], 401);
     }
 }
