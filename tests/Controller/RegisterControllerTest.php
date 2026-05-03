@@ -11,7 +11,7 @@ class RegisterControllerTest extends WebTestCase
         $client = static::createClient();
 
         $client->jsonRequest('POST', '/api/v1/register', [
-            'email' => 'newuser@example.com',
+            'email' => 'newuser27@example.com',
             'password' => 'secret123',
         ]);
 

@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializerInterface;
+use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -51,6 +52,11 @@ final class RegisterController extends AbstractController
                 properties: [
                     new OA\Property(property: 'token', type: 'string', example: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...'),
                     new OA\Property(
+                        property: 'refresh_token',
+                        type: 'string',
+                        example: 'refresh_token_string'
+                    ),
+                    new OA\Property(
                         property: 'roles',
                         type: 'array',
                         items: new OA\Items(type: 'string')
@@ -84,7 +90,8 @@ final class RegisterController extends AbstractController
             UserRepository $userRepository,
             UserPasswordHasherInterface $passwordHasher,
             EntityManagerInterface $entityManager,
-            JWTTokenManagerInterface $jwtManager
+            JWTTokenManagerInterface $jwtManager,
+            RefreshTokenGeneratorInterface $refreshTokenGenerator
       ): JsonResponse {
             $userDto = $serializer->deserialize(
                   $request->getContent(),
@@ -121,11 +128,19 @@ final class RegisterController extends AbstractController
             );
 
             $entityManager->persist($user);
+
+            $refreshToken = $refreshTokenGenerator->createForUserWithTtl(
+                $user,
+                30 * 24 * 60 * 60
+            );
+
+            $entityManager->persist($refreshToken);
             $entityManager->flush();
 
             return $this->json([
-                  'token' => $jwtManager->create($user),
-                  'roles' => $user->getRoles(),
+                'token' => $jwtManager->create($user),
+                'refresh_token' => $refreshToken->getRefreshToken(),
+                'roles' => $user->getRoles(),
             ], 201);
       }
       }
