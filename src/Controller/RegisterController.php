@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use App\Service\PaymentService;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use OpenApi\Attributes as OA;
 
 
@@ -91,7 +93,10 @@ final class RegisterController extends AbstractController
             UserPasswordHasherInterface $passwordHasher,
             EntityManagerInterface $entityManager,
             JWTTokenManagerInterface $jwtManager,
-            RefreshTokenGeneratorInterface $refreshTokenGenerator
+            RefreshTokenGeneratorInterface $refreshTokenGenerator,
+            PaymentService $paymentService,
+            #[Autowire('%initial_user_balance%')]
+            float $initialUserBalance,
       ): JsonResponse {
             $userDto = $serializer->deserialize(
                   $request->getContent(),
@@ -128,6 +133,9 @@ final class RegisterController extends AbstractController
             );
 
             $entityManager->persist($user);
+            $entityManager->flush();
+
+            $paymentService->deposit($user, $initialUserBalance);
 
             $refreshToken = $refreshTokenGenerator->createForUserWithTtl(
                 $user,
