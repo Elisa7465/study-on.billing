@@ -13,6 +13,7 @@ class AppFixtures extends Fixture
 {
     public const USER_REFERENCE = 'user';
     public const ADMIN_REFERENCE = 'admin';
+    public const POOR_USER_REFERENCE = 'poor_user';
 
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
@@ -53,5 +54,18 @@ class AppFixtures extends Fixture
         $this->paymentService->deposit($admin, $this->initialUserBalance);
 
         $this->addReference(self::ADMIN_REFERENCE, $admin);
+
+        $poorUser = new User();
+        $poorUser->setEmail('poor-user@example.com');
+        $poorUser->setRoles(['ROLE_USER']);
+        $poorUser->setBalance(0.0);
+        $poorUser->setPassword(
+            $this->passwordHasher->hashPassword($poorUser, 'user123')
+        );
+
+        $manager->persist($poorUser);
+        $manager->flush();
+
+        $this->addReference(self::POOR_USER_REFERENCE, $poorUser);
     }
 }
