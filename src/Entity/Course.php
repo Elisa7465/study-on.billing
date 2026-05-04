@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[UniqueEntity(fields: ['symbolCode'], message: 'Этот код уже используется')]
 class Course
 {
+    public const TYPE_FREE = 0;
     public const TYPE_RENT = 1;
     public const TYPE_BUY = 2;
 
@@ -82,6 +83,20 @@ class Course
         return $this;
     }
 
+    public function getTypeName(): string
+    {
+        return match ($this->type) {
+            self::TYPE_FREE => 'free',
+            self::TYPE_RENT => 'rent',
+            self::TYPE_BUY => 'buy',
+            default => 'unknown',
+        };
+    }
+
+    public function isFree(): bool
+    {
+        return self::TYPE_FREE === $this->type;
+    }
     public function isRent(): bool
     {
         return self::TYPE_RENT === $this->type;

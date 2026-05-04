@@ -120,6 +120,14 @@ class Transaction
         return $this;
     }
 
+    public function getTypeName(): string
+    {
+        return match ($this->type) {
+            self::TYPE_DEPOSIT => 'deposit',
+            self::TYPE_PAYMENT => 'payment',
+            default => 'unknown',
+        };
+    }
     public function isDeposit(): bool
     {
         return self::TYPE_DEPOSIT === $this->type;
