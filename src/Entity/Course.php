@@ -31,6 +31,9 @@ class Course
     #[ORM\Column(nullable: true)]
     private ?float $price = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
+
     /**
      * @var Collection<int, Transaction>
      */
@@ -105,6 +108,18 @@ class Course
     public function isBuy(): bool
     {
         return self::TYPE_BUY === $this->type;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
     }
 
     /**
