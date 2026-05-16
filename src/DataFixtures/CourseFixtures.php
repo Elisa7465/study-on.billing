@@ -20,6 +20,24 @@ final class CourseFixtures extends Fixture
     {
         $coursesData = [
             [
+                'reference' => 'legacy_free_course',
+                'symbolCode' => 'html-basic',
+                'type' => Course::TYPE_FREE,
+                'price' => null,
+            ],
+            [
+                'reference' => 'legacy_rent_course',
+                'symbolCode' => 'symfony-rent',
+                'type' => Course::TYPE_RENT,
+                'price' => 99.90,
+            ],
+            [
+                'reference' => 'legacy_buy_course',
+                'symbolCode' => 'symfony-buy',
+                'type' => Course::TYPE_BUY,
+                'price' => 159.00,
+            ],
+            [
                 'reference' => self::COURSE_PHP_BASIC,
                 'symbolCode' => 'php-basic',
                 'type' => Course::TYPE_FREE,
