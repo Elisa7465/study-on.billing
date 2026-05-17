@@ -120,7 +120,7 @@ final class CourseController extends AbstractController
 
 
     #[Route('', name: 'api_v1_courses_create', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[OA\Post(
         path: '/api/v1/courses',
         summary: 'Создание курса',
@@ -224,7 +224,7 @@ final class CourseController extends AbstractController
     }
 
     #[Route('/{code}', name: 'api_v1_courses_update', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted('ROLE_SUPER_ADMIN')]
     #[OA\Post(
         path: '/api/v1/courses/{code}',
         summary: 'Редактирование курса',
