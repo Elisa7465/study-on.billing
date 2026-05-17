@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Course;
 use App\Entity\User;
 
+
 /**
  * @extends ServiceEntityRepository<Transaction>
  */
@@ -48,6 +49,26 @@ class TransactionRepository extends ServiceEntityRepository
         }
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+
+    public function findEndingRentTransactions(
+        \DateTimeImmutable $from,
+        \DateTimeImmutable $to
+    ): array {
+        return $this->createQueryBuilder('t')
+            ->join('t.course', 'c')
+            ->join('t.user', 'u')
+            ->andWhere('t.type = :type')
+            ->andWhere('c.type = :courseType')
+            ->andWhere('t.expiresAt BETWEEN :from AND :to')
+            ->setParameter('type', Transaction::TYPE_PAYMENT)
+            ->setParameter('courseType', Course::TYPE_RENT)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('t.expiresAt', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
 //    /**
