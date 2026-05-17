@@ -71,6 +71,32 @@ class TransactionRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+
+    public function getMonthlyPaidCoursesReport(
+        \DateTimeImmutable $from,
+        \DateTimeImmutable $to
+    ): array {
+        return $this->createQueryBuilder('t')
+            ->select('
+                c.symbolCode as courseName,
+                c.type as courseType,
+                COUNT(t.id) as paymentsCount,
+                SUM(t.amount) as totalAmount
+            ')
+            ->join('t.course', 'c')
+            ->andWhere('t.type = :type')
+            ->andWhere('t.createdAt BETWEEN :from AND :to')
+            ->setParameter('type', Transaction::TYPE_PAYMENT)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->groupBy('c.id')
+            ->addGroupBy('c.symbolCode')
+            ->addGroupBy('c.type')
+            ->orderBy('c.symbolCode', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
 //    /**
 //     * @return Transaction[] Returns an array of Transaction objects
 //     */

@@ -1,0 +1,42 @@
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет об оплаченных курсах</title>
+</head>
+<body>
+<table cellpadding="0" cellspacing="0" width="100%" style="font-family: Arial, sans-serif;">
+    <tr>
+        <td>
+            <h2>Отчет об оплаченных курсах за период {{ from|date('d.m.Y') }} - {{ to|date('d.m.Y') }}</h2>
+
+            <table cellpadding="8" cellspacing="0" border="1" width="100%" style="border-collapse: collapse;">
+                <thead>
+                <tr>
+                    <th align="left">Название курса</th>
+                    <th align="left">Тип курса</th>
+                    <th align="left">Число аренд/покупок</th>
+                    <th align="left">Общая сумма</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row.courseName }}</td>
+                        <td>{{ row.courseType }}</td>
+                        <td>{{ row.paymentsCount }}</td>
+                        <td>{{ row.totalAmount }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">За период оплат нет</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            <p><b>Итого: {{ total }}</b></p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
