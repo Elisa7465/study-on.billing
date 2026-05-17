@@ -30,31 +30,31 @@ jobs:
 
       - name: Setting Docker
         run: |
-          docker-compose build
-          docker-compose up -d
+          docker compose build
+          docker compose up -d
           docker ps -a
 
       - name: Composer install inside container
         run: |
-          docker-compose exec -T php composer install --no-interaction --prefer-dist
+          docker compose exec -T php composer install --no-interaction --prefer-dist
 
       - name: Wait for PostgreSQL
         run: |
-          until docker-compose exec -T postgres pg_isready -U pguser; do
+          until docker compose exec -T postgres pg_isready -U pguser; do
             sleep 1
           done
 
       - name: Setting JWT
         run: |
-          docker-compose exec -T php php bin/console lexik:jwt:generate-keypair --overwrite --env=test
+          docker compose exec -T php php bin/console lexik:jwt:generate-keypair --overwrite --env=test
 
       - name: Setting test DB
         run: |
-          docker-compose exec -T php php bin/console doctrine:database:drop --force --if-exists --env=test || true
-          docker-compose exec -T php php bin/console doctrine:database:create --if-not-exists --env=test
-          docker-compose exec -T php php bin/console doctrine:migrations:migrate -n --env=test
-          docker-compose exec -T php php bin/console doctrine:fixtures:load -n --env=test
+          docker compose exec -T php php bin/console doctrine:database:drop --force --if-exists --env=test || true
+          docker compose exec -T php php bin/console doctrine:database:create --if-not-exists --env=test
+          docker compose exec -T php php bin/console doctrine:migrations:migrate -n --env=test
+          docker compose exec -T php php bin/console doctrine:fixtures:load -n --env=test
 
       - name: Run PHPUnit
         run: |
-          docker-compose exec -T php php bin/phpunit
+          docker compose exec -T php php bin/phpunit
