@@ -314,4 +314,44 @@ final class TransactionControllerTest extends WebTestCase
         self::assertArrayHasKey('expires_at', $data[0]);
         self::assertNotNull($data[0]['expires_at']);
     }
+    // Проверяет, что срок действия аренды по коду web-design-basic есть в фикстуре.
+    public function testExpiredRentExistsInFixtures(): void
+    {
+        $auth = $this->authenticateUser();
+
+        $auth['client']->request(
+            'GET',
+            '/api/v1/transactions?filter[course_code]=web-design-basic',
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $auth['token']]
+        );
+
+        self::assertResponseStatusCodeSame(200);
+
+        $data = json_decode($auth['client']->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertNotEmpty($data);
+        self::assertArrayHasKey('expires_at', $data[0]);
+        self::assertLessThan(time(), strtotime($data[0]['expires_at']));
+    }
+    //Фильтр skip_expired убирает истекшие аренды
+    public function testSkipExpiredHidesExpiredRentFromFixtures(): void
+    {
+        $auth = $this->authenticateUser();
+
+        $auth['client']->request(
+            'GET',
+            '/api/v1/transactions?filter[course_code]=web-design-basic&filter[skip_expired]=1',
+            [],
+            [],
+            ['HTTP_AUTHORIZATION' => 'Bearer ' . $auth['token']]
+        );
+
+        self::assertResponseStatusCodeSame(200);
+
+        $data = json_decode($auth['client']->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame([], $data);
+    }
 }

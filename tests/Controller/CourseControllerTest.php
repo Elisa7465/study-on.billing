@@ -301,4 +301,51 @@ final class CourseControllerTest extends WebTestCase
         self::assertSame(406, $data['code']);
         self::assertSame('На вашем счету недостаточно средств', $data['message']);
     }
+
+    // Проверяет неуспешную редактирование курса.
+    public function testEditCourseDeniedForUser(): void
+    {
+        $auth = $this->authenticateUser('user@example.com', 'user123');
+
+        $auth['client']->jsonRequest(
+            'POST',
+            '/api/v1/courses/symfony-rent',
+            [
+                'type' => 'rent',
+                'title' => 'Новое название',
+                'code' => 'symfony-rent-new',
+                'price' => 120,
+            ],
+            [
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $auth['token'],
+            ]
+        );
+
+        self::assertResponseStatusCodeSame(403);
+    }
+    // Проверяет успешную редактирование курса.
+    public function testEditCourseAllowedForSuperAdmin(): void
+    {
+        $auth = $this->authenticateUser('admin@example.com', 'admin123');
+
+        $auth['client']->jsonRequest(
+            'POST',
+            '/api/v1/courses/symfony-rent',
+            [
+                'type' => 'rent',
+                'title' => 'Новое название',
+                'code' => 'symfony-rent-new',
+                'price' => 120,
+            ],
+            [
+                'HTTP_AUTHORIZATION' => 'Bearer ' . $auth['token'],
+            ]
+        );
+
+        self::assertResponseStatusCodeSame(200);
+
+        $data = json_decode($auth['client']->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame(['success' => true], $data);
+    }
 }

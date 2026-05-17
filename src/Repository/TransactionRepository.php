@@ -78,7 +78,7 @@ class TransactionRepository extends ServiceEntityRepository
     ): array {
         return $this->createQueryBuilder('t')
             ->select('
-                c.symbolCode as courseName,
+                c.title as courseName,
                 c.type as courseType,
                 COUNT(t.id) as paymentsCount,
                 SUM(t.amount) as totalAmount
