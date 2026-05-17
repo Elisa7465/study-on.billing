@@ -1,7 +1,7 @@
 name: CI
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   workflow_dispatch:
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4.5'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_pgsql
           coverage: pcov
           tools: composer
       - name: Setting environment and composer
@@ -53,6 +53,5 @@ jobs:
           docker-compose exec -T php bin/console doctrine:database:create --env=test
           docker-compose exec -T php bin/console doctrine:migrations:migrate -n --env=test
           docker-compose exec -T php bin/console doctrine:fixtures:load -n --env=test
-          docker-compose exec -T php bin/phpunit
       - name: run PHPUnit
         run: docker-compose exec -T php bin/phpunit
